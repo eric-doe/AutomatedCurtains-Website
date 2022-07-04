@@ -1,0 +1,49 @@
+
+body {
+    background-color: gray;
+}
+
+h3 {
+    margin: 10px 0px;
+    font-family: arial;
+}
+
+#allContent {
+    width: 900px;
+    text-align: center;
+    margin: auto;
+}
+
+.btns {
+    width: 60px;
+    margin-bottom: 20px;
+    padding: 6px;
+    font-weight: bold;
+    border: 2px solid;
+}
+
+.btns:hover {
+    cursor: pointer;
+}
+
+#chartDate {
+    font-weight: bold;
+    font-family: arial;
+    font-size: 1.2em;
+    margin-top: 20px;
+    width: 200px;
+    margin: auto;
+    background: white;
+    padding: 8px 0;
+    border: 2px solid;
+    border-radius: 15px 15px 10px 10px;
+}
+
+#statBlock {
+    width: 300px;
+    margin: 10px auto;
+    background: white;
+    padding: 8px 0;
+    border: 2px solid;
+    border-radius: 15px 15px 10px 10px;
+}

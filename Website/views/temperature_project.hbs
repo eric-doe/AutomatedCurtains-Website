@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="./css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <title>Apartment Temperature Project</title>
+</head>
+
+<body>
+    <br>
+    <div id="allContent">
+        <div id="chartDate"></div>
+        <br>
+        <div>
+            <button class="btns" onclick="chartChangeDay('previous')">Back</button>
+            <button class="btns" onclick="chartChangeDay('next')">Next</button>
+        </div>
+        <div id="myChart" style="width:100%;max-width:600px;height:500px;"></div>
+        <div id="statBlock">
+            <h3>Day Temperature statistics</h3>
+            <div id="chartCurDateAvgTemp"></div>
+            <div id="chartCurDateMaxTemp"></div>
+            <div id="chartCurDateMinTemp"></div>
+            <br>
+            <h3>Temperature Records</h3>
+            <div id="chartAllTimeMaxTemp"></div>
+            <div id="chartAllTimeMinTemp"></div>
+        </div>
+    </div>
+
+    <script src="./scripts/temp_script.js"></script>
+    <script src="./scripts/calculations.js"></script>
+</body>
+
+</html>
