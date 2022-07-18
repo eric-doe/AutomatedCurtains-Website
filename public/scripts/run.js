@@ -1,0 +1,3 @@
+
+websiteOnload();
+getDataFunc();

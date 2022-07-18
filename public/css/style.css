@@ -1,6 +1,6 @@
 
 body {
-    background-color: gray;
+    background-color: #5e6176;
 }
 
 h3 {
@@ -9,24 +9,14 @@ h3 {
 }
 
 #allContent {
-    width: 900px;
+    width: 800px;
     text-align: center;
     margin: auto;
 }
 
-.btns {
-    width: 60px;
-    margin-bottom: 20px;
-    padding: 6px;
-    font-weight: bold;
-    border: 2px solid;
-}
-
-.btns:hover {
-    cursor: pointer;
-}
 
 #chartDate {
+    height: 44px;
     font-weight: bold;
     font-family: arial;
     font-size: 1.2em;
@@ -36,8 +26,53 @@ h3 {
     background: white;
     padding: 8px 0;
     border: 2px solid;
-    border-radius: 15px 15px 10px 10px;
+    border-radius: 10px;
 }
+
+#mainContent {
+    background-color: white;
+    width: 100%;
+    border: 2px solid;
+    border-radius: 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
+}
+
+#myChart {
+    height: 360px;
+}
+
+#dataChartModeOptions {
+    height: 60px;
+    width: 240px;
+    text-align: center;
+}
+
+.btns {
+    width: 120px;
+    margin: 4px 10px 20px 4px;
+    text-shadow: 2px 2px 1px #000000;
+    box-shadow: 4px 4px 8px 0 rgb(0 0 0);
+    padding: 4px;
+    font-weight: bold;
+    border-radius: 10px;
+    font-size: 1.6em;
+    border-left: 6px solid #3360a1;
+    border-right: 6px solid #486fa9;
+    border-top: 6px solid #486fa9;
+    border-bottom: 6px solid #3360a1;
+    background: #195ac2;
+    color: white;
+    outline: none;
+}
+
+.btns:hover {
+    background: #1d65d7;
+    text-shadow: 3px 3px 3px #000000;
+    box-shadow: 5px 5px 8px 0 rgb(0 0 0);
+    cursor: pointer;
+}
+
 
 #statBlock {
     width: 300px;
@@ -45,5 +80,6 @@ h3 {
     background: white;
     padding: 8px 0;
     border: 2px solid;
-    border-radius: 15px 15px 10px 10px;
+    border-radius: 10px;
+    height: 200px;
 }

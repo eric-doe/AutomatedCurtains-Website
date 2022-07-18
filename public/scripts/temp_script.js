@@ -8,118 +8,50 @@ const ONE_DAY_IN_MILLIS = 86400000
 const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+var globalMax
+var globalMin
 
 var allData;
-var dataLoaded = false
-var chartArray
-var curDayAvgTemp
 
-function initChart(array) {
-    // var data = new google.visualization.DataTable();
-    data = new google.visualization.DataTable();
-    data.addColumn('datetime', 'Time of Day');
-    data.addColumn('number', 'Temperature');
-    data.addColumn('number', 'Average day');
-    data.addRows(
-        array
-    );
-    
-    displayStats()
-    options = {
-        title: 'Apartment Temperature Data',
-        subtitle: 'Dots represent temperature measurements',
-        width: 900,
-        // backgroundColor: 'transparent',
-        height: 500,
-        colors: ['#1554c7', '#4bc70c', '#ec8f6e', '#f3b49f', '#f6c7b6'],
-        pointSize: 5,
-        dataOpacity: 0.5,
-        legend: { position: 'none' },
-        hAxis: {
-            title: 'Time of day',
-            viewWindow: {
-                min: lowerTimeLimit,
-                max: upperTimeLimit
-            },
-            gridlines: {
-                count: -1,
-                units: {
-                    days: { format: ['MMM dd'] },
-                    hours: { format: ['HH:mm', 'ha'] }
-                }
-            },
-            minorGridlines: {
-              units: {
-                hours: {format: ['hh:mm:ss a', 'ha']},
-                minutes: {format: ['HH:mm a Z', ':mm']}
-              }
-            }
-        },
-        vAxis: {
-            title: 'Temperature (C)',
-            viewWindow: {
-                min: 0,
-                max: 40
-            }
-        }
-    };
-    chart = new google.visualization.LineChart(document.getElementById('myChart'));
-    chart.draw(data, options);
+
+function displayDate() {
+    var day = days[lowerTimeLimit.getDay()]
+    var date = lowerTimeLimit.getDate()
+    var month = months[lowerTimeLimit.getMonth()]
+    var year = lowerTimeLimit.getFullYear()
+    document.getElementById("chartDate").innerHTML = day + " " + date + "<br>" + month + " " + year;
 }
 
-function chartChangeDay(next_or_previous_day) {
-    if (next_or_previous_day == "next") {
-        upperTimeLimit.setTime(upperTimeLimit.getTime() + ONE_DAY_IN_MILLIS)
-        lowerTimeLimit.setTime(lowerTimeLimit.getTime() + ONE_DAY_IN_MILLIS)
-    } else if (next_or_previous_day == "previous") {
-        upperTimeLimit.setTime(upperTimeLimit.getTime() - ONE_DAY_IN_MILLIS)
-        lowerTimeLimit.setTime(lowerTimeLimit.getTime() - ONE_DAY_IN_MILLIS)
+function formatTime(hour, min, separator = ":") {
+    var timeString = ""
+    if (hour < 10) {
+        timeString += "0" + hour;
+    } else {
+        timeString += hour;
     }
-    options.hAxis.viewWindow.max = upperTimeLimit
-    options.hAxis.viewWindow.min = lowerTimeLimit
-    chart.draw(data, options);
-    getCurDayArr(allData)
-    dayAvgArray = []
-    curDayAvgTemp = calcAvgDayTemp();
-    
-    mymax = findArrayMinMaxTemp(curDayArray, "max")
-    mymin = findArrayMinMaxTemp(curDayArray, "min")
-    displayStats()
+    timeString += separator;
+    if (min < 10) {
+        timeString += "0" + min;
+    } else {
+        timeString += min;
+    }
+    return timeString
 }
 
 function displayStats() {
-    document.getElementById("chartDate").innerHTML = days[lowerTimeLimit.getDay()] + " " + lowerTimeLimit.getDate() + "<br>" + months[lowerTimeLimit.getMonth()] + " " + lowerTimeLimit.getFullYear();
+    displayDate()
     if (curDayAvgTemp > 0) {
         var avgMsg = Math.round(curDayAvgTemp * 10) / 10 + " C";
-        var maxMsg = Math.round(mymax.temperature * 10) / 10 + " C";
-        var minMsg = Math.round(mymin.temperature * 10) / 10 + " C";
+        var minMsg = Math.round(mymin.temperature * 10) / 10 + " C (" + formatTime(mymin.hour, mymin.min) + ")";
+        var maxMsg = Math.round(mymax.temperature * 10) / 10 + " C (" + formatTime(mymax.hour, mymax.min) + ")";
     } else {
         var avgMsg = "None";
         var maxMsg = "None";
         var minMsg = "None";
     }
     document.getElementById("chartCurDateAvgTemp").innerHTML = "Day Average: " + avgMsg;
-    document.getElementById("chartCurDateMinTemp").innerHTML = "Lowest: " + minMsg;
     document.getElementById("chartCurDateMaxTemp").innerHTML = "Highest: " + maxMsg;
-}
-
-function googleChart() {
-    google.charts.load('current', { packages: ['corechart'] });
-    chartArray = createGoogleDataArray()
-    google.charts.setOnLoadCallback(() => { initChart(chartArray) });
-}
-
-
-
-function createGoogleDataArray() {
-    googleDataArray = []
-    googleDataArray2 = []
-    for (let i = 0; i < allData.length; i++) {
-        googleDataArray.push(
-            [new Date(allData[i].year, allData[i].month, allData[i].day, allData[i].hour, allData[i].min), allData[i].temperature, null]
-        )
-    }
-    return googleDataArray
+    document.getElementById("chartCurDateMinTemp").innerHTML = "Lowest: " + minMsg;
 }
 
 
@@ -133,30 +65,17 @@ function sortArrayByTime(array) {
     return tempArr
 }
 
-var dataSpecs = []
-
 function getDataFunc() {
     fetch('/getdata')
         .then((response) => {
             response.json()
                 .then((data) => {
                     var dataArray = []
-                    var dayCounter = -1
-                    for (let i = 0; i < data.result.length; i++) {                        
-                        if (dayCounter != data.result[i].payload.time.dayOfYear) {
-                            dayCounter = data.result[i].payload.time.dayOfYear
-                            dataSpecs.push({
-                                dayOfYear: data.result[i].payload.time.dayOfYear,
-                                dataStartIndex: i,
-                                dataCount: 0
-                            })
-                        }
-                        dataSpecs[dataSpecs.length - 1].dataCount++
-
+                    for (let i = 0; i < data.result.length; i++) {
                         dataArray.push({})
                         dataArray[i].temperature = data.result[i].payload.temp
                         dataArray[i].curtainsClosed = data.result[i].payload.curtainsClosed
-                        dataArray[i].doorClosed = typeof (data.result[i].payload.curtainsClosed) == "undefined" ? "none" : data.result[i].payload.curtainsClosed;
+                        dataArray[i].doorClosed = typeof (data.result[i].payload.doorClosed) == "undefined" ? true : data.result[i].payload.doorClosed;
                         dataArray[i].formattedTime = (data.result[i].payload.time.dayOfYear * 100) + data.result[i].payload.time.hour + (data.result[i].payload.time.min * 0.01)
                         dataArray[i].hour = data.result[i].payload.time.hour
                         dataArray[i].min = data.result[i].payload.time.min
@@ -168,9 +87,8 @@ function getDataFunc() {
                         dataArray[i].year = data.result[i].payload.time.year
                     }
                     dataArray = sortArrayByTime(dataArray)
-                    console.log(dataArray)
-                    allData = dataArray
-                    dataLoaded = true
+                    allData = createBigData(dataArray)
+                    runCode()
                 })
                 .catch((err) => {
                     console.error(err)
@@ -181,102 +99,83 @@ function getDataFunc() {
         })
 }
 
+function createBigData(arrayArg) {
+    var resultObject = {}
+    resultObject.dayOfYearList = [arrayArg[0].dayOfYear]
+    resultObject.data = [
+        []
+    ];
+    var objCount = 0
+    var curIndex = 0;
+    var curDayOfYear = arrayArg[0].dayOfYear;
+    for (let i = 0; i < arrayArg.length; i++) {
+        if (curDayOfYear != arrayArg[i].dayOfYear) {
+            curDayOfYear = arrayArg[i].dayOfYear;
+            resultObject.data.push([]);
+            curIndex++;
+            if (curDayOfYear == getDayOfYear(curTime)) {
+                resultObject.curDayOfYearIndex = curIndex
+                resultObject.curDayOfYear = getDayOfYear(curTime)
+            }
+            resultObject.dayOfYearList.push(arrayArg[i].dayOfYear)
+            i--;
+            objCount = 0;
+            continue
+        }
+        objCount++;
+        resultObject.data[curIndex].push(arrayArg[i])
+    }
+    resultObject.maxList = []
+    resultObject.minList = []
+    for (let i = 0; i < resultObject.data.length; i++) {
+        var tempmax = findArrayMinMaxTemp(resultObject.data[i], "max")
+        var tempmin = findArrayMinMaxTemp(resultObject.data[i], "min")
+        resultObject.maxList.push(tempmax)
+        resultObject.minList.push(tempmin)
+    }
+    return resultObject
+}
+
 
 
 function runCode() {
-    if (!dataLoaded) {
-        setTimeout(() => {
-            console.log("Trying again...")
-            runCode()
-        }, 500);
-    } else {
-        console.log("Runing program!")
-        googleChart()
-        
-        globalMax = findArrayMinMaxTemp(allData, "max")
-        globalMin = findArrayMinMaxTemp(allData, "min")
-        var globalMaxMsg = "Highest: (" + Math.round(globalMax.temperature * 10) / 10 + " C) at: " + globalMax.day + " " + months[globalMax.month] + ", " + globalMax.hour + ":" + globalMax.min;
-        var globalMinMsg = "Lowest: (" + Math.round(globalMin.temperature * 10) / 10 + " C) at: " + globalMin.day + " " + months[globalMin.month] + ", " + globalMin.hour + ":" + globalMin.min;
-        document.getElementById("chartAllTimeMinTemp").innerHTML = globalMinMsg;
-        document.getElementById("chartAllTimeMaxTemp").innerHTML = globalMaxMsg;
-        
-        getCurDayArr(allData)
-        dayAvgArray = []
-        curDayAvgTemp = calcAvgDayTemp();
-        
-        mymax = findArrayMinMaxTemp(curDayArray, "max")
-        mymin = findArrayMinMaxTemp(curDayArray, "min")
-        displayStats()
-    }
-}
+    console.log("Runing program!")
+    googleChartUpdate(['#1554c7'])
 
-getDataFunc();
-runCode()
+    globalMax = findGlobalMinMaxTemp(allData.data, "max")
+    globalMin = findGlobalMinMaxTemp(allData.data, "min")
 
-
-
-
-/*
-
-function createGoogleDataArray3() {
-    googleDataArray = [
-        ['Time', 'Temperature']
-    ]
-    for (let i = 0; i < allData[2].length; i++) {
-        var timeConvert = (allData[2][i].min)
-        timeConvert += allData[2][i].hour
-        googleDataArray.push([
-            timeConvert,
-            allData[2][i].temperature
-        ])
-    }
-    return googleDataArray
+    var globalMaxMsg = "Highest: " + Math.round(globalMax.temperature * 10) / 10 + " C (" + globalMax.day + " " + months[globalMax.month] + ", " + formatTime(globalMax.hour, globalMax.min) + ")";
+    var globalMinMsg = "Lowest: " + Math.round(globalMin.temperature * 10) / 10 + " C (" + globalMin.day + " " + months[globalMin.month] + ", " + formatTime(globalMin.hour, globalMin.min) + ")";
+    document.getElementById("chartAllTimeMinTemp").innerHTML = globalMinMsg;
+    document.getElementById("chartAllTimeMaxTemp").innerHTML = globalMaxMsg;
+    
+    getCurDayArr(allData)
+    dayAvgArray = []
+    curDayAvgTemp = calcAvgDayTemp();
+    
+    mymax = allData.curDayOfYearIndex >= 0 ? allData.maxList[allData.curDayOfYearIndex] : "none"
+    mymin = allData.curDayOfYearIndex >= 0 ? allData.minList[allData.curDayOfYearIndex] : "none"
+    
+    displayStats()
 }
 
 
-function getDataFunc() {
-    fetch('/temperature_project/getdata')
-        .then((response) => {
-            response.json()
-                .then((data) => {
-                    var dataArray = []
-                    var dayNum = data.result[0].payload.time.dayOfYear - 1 // first day in database
-                    var arrayCounter = 0
-                    var arrayIndexCounter = 0
-                    for (let i = 0; i < data.result.length; i++) {
-                        arrayIndexCounter++
-                        while (dayNum < data.result[i].payload.time.dayOfYear) {
-                            dayNum++
-                            arrayCounter++
-                            arrayIndexCounter = 0
-                            dataArray.push([])
-                        }
-                        dataArray[arrayCounter - 1].push({})
-                        dataArray[arrayCounter - 1][arrayIndexCounter].temperature = data.result[i].payload.temp
-                        dataArray[arrayCounter - 1][arrayIndexCounter].curtainsClosed = data.result[i].payload.curtainsClosed
-                        dataArray[arrayCounter - 1][arrayIndexCounter].doorClosed = typeof (data.result[i].payload.curtainsClosed) == "undefined" ? false : true;
-                        dataArray[arrayCounter - 1][arrayIndexCounter].timeOfDay = data.result[i].payload.time.hour + (data.result[i].payload.time.min * 0.01)
-                        dataArray[arrayCounter - 1][arrayIndexCounter].hour = data.result[i].payload.time.hour
-                        dataArray[arrayCounter - 1][arrayIndexCounter].min = data.result[i].payload.time.min
-                        dataArray[arrayCounter - 1][arrayIndexCounter].day = data.result[i].payload.time.day
-                        dataArray[arrayCounter - 1][arrayIndexCounter].dayOfWeek = data.result[i].payload.time.dayOfWeek
-                        dataArray[arrayCounter - 1][arrayIndexCounter].dayOfYear = data.result[i].payload.time.dayOfYear
-                        dataArray[arrayCounter - 1][arrayIndexCounter].month = data.result[i].payload.time.month
-                        dataArray[arrayCounter - 1][arrayIndexCounter].sec = data.result[i].payload.time.sec
-                        dataArray[arrayCounter - 1][arrayIndexCounter].year = data.result[i].payload.time.year
-                    }
-                    dataArray = sortArrayByTime(dataArray)
-                    console.log(dataArray)
-                    allData = dataArray
-                    dataLoaded = true
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+function websiteOnload() {
+    var day = days[curTime.getDay()]
+    var date = curTime.getDate()
+    var month = months[curTime.getMonth()]
+    var year = curTime.getFullYear()
+    document.getElementById("chartDate").innerHTML = day + " " + date + "<br>" + month + " " + year;
+    document.getElementById("chartCurDateAvgTemp").innerHTML = "Day Average: Loading...";
+    document.getElementById("chartCurDateMinTemp").innerHTML = "Lowest: Loading...";
+    document.getElementById("chartCurDateMaxTemp").innerHTML = "Highest: Loading...";
+    document.getElementById("chartAllTimeMinTemp").innerHTML = "<br>";
+    document.getElementById("chartAllTimeMaxTemp").innerHTML = "<br>";
+
+    initChart()
+
+    displayStats()
 }
 
-*/
+

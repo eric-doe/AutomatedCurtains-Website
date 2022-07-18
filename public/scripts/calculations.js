@@ -1,4 +1,5 @@
 
+
 function getDayOfYear(time) {
     var now = time;
     var start = new Date(now.getFullYear(), 0, 0);
@@ -10,7 +11,7 @@ function getDayOfYear(time) {
 
 
 function findArrayMinMaxTemp(array, min_or_max) {
-    if (array.length == 0) {
+    if (array.curDayOfYearIndex == -1) {
         return "none"
     }
     min_maxTemp = array[0].temperature
@@ -26,24 +27,22 @@ function findArrayMinMaxTemp(array, min_or_max) {
     return min_max
 }
 
+function findGlobalMinMaxTemp(array, min_or_max) {
+    var globalMinMax = []
+    for (let i = 0; i < array.length; i++) {
+        globalMinMax.push(findArrayMinMaxTemp(array[i], min_or_max))
+    }
+    return findArrayMinMaxTemp(globalMinMax, min_or_max)
+}
+
 var curDayArray = []
 var dayAvgArray = []
 
-function getCurDayArr(array) {
-    var selectedDay = getDayOfYear(lowerTimeLimit);
-    var startIndex = 0
-    var endIndex = 0
-    for (let i = 0; i < dataSpecs.length; i++) {
-        if (dataSpecs[i].dayOfYear == selectedDay) {
-            startIndex = dataSpecs[i].dataStartIndex
-            endIndex = dataSpecs[i].dataStartIndex + dataSpecs[i].dataCount - 1
-            break
-        }
+function getCurDayArr() {
+    if (allData.curDayOfYearIndex < 0) {
+        return []
     }
-    curDayArray = []
-    for (let i = startIndex; i < endIndex; i++) {
-        curDayArray.push(array[i])
-    }
+    curDayArray = allData.data[allData.curDayOfYearIndex]
     return curDayArray
 }
 
@@ -70,6 +69,10 @@ function calcArrayAvg(array) {
 function calcAvgDayTemp() {
     var hourArray = []
     var curHour = 0
+    if (allData.curDayOfYearIndex < 0) {
+        return
+    }
+    
     for (let i = 0; i < curDayArray.length; i++) {
         if (curHour != curDayArray[i].hour) {
             curHour = curDayArray[i].hour

@@ -2,6 +2,7 @@
 <html>
 
 <head>
+    <link rel="icon" href="./images/thermometer.png">
     <link rel="stylesheet" href="./css/style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -17,7 +18,16 @@
             <button class="btns" onclick="chartChangeDay('previous')">Back</button>
             <button class="btns" onclick="chartChangeDay('next')">Next</button>
         </div>
-        <div id="myChart" style="width:100%;max-width:600px;height:500px;"></div>
+        <div id="mainContent">
+            <div id="myChart"></div>
+            <div id="chartOptions">
+                <select class="btns" onchange="selectDropdown()" name="dataChartMode" id="dataChartModeOptions">
+                    <option selected onclick="googleChartUpdate(['#1554c7'])" value="data">Raw Daily Data</option>
+                    <option onclick="googleChartUpdate(['#4bc70c', '#346fed'], 'curtainsClosed')" value="curtain">Curtain Status</option>
+                    <option onclick="googleChartUpdate(['#346fed', '#e38445'], 'doorClosed')" value="door">Door Status</option>
+                </select>
+            </div>
+        </div>
         <div id="statBlock">
             <h3>Day Temperature statistics</h3>
             <div id="chartCurDateAvgTemp"></div>
@@ -32,6 +42,8 @@
 
     <script src="./scripts/temp_script.js"></script>
     <script src="./scripts/calculations.js"></script>
+    <script src="./scripts/chart.js"></script>
+    <script src="./scripts/run.js"></script>
 </body>
 
 </html>
