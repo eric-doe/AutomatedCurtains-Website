@@ -1,0 +1,31 @@
+{
+  "name": "automated-curtains",
+  "version": "1.0.0",
+  "description": "Curtains controlled with a motor and a temperature sensor. Sends data to a database and then the website GET the data for visual representation.",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "author": "Eric Jansson",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.18"
+  },
+  "dependencies": {
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "hbs": "^4.2.0",
+    "mongodb": "^4.7.0",
+    "mongoose": "^6.4.2",
+    "request": "^2.88.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eric-doe/AutomatedCurtains-Website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eric-doe/AutomatedCurtains-Website/issues"
+  },
+  "homepage": "https://github.com/eric-doe/AutomatedCurtains-Website#readme"
+}
