@@ -38,12 +38,29 @@ app.get('', (req, res) => {
 })
 
 app.get('/getdata', (req, res) => {
+    var formattedResult = [];
     TemperatureData.find()
     .then((result) => {
+        var myjson;
+        var myparsed;
+        const twelveHours = 43200000;
+        var curDate = new Date();
+        for (let i = 0; i < result.length; i++) {
+            // why cant I reach the fricking object's attributes before this stupid JSON shuffle?
+            myjson = JSON.stringify(result[i])
+            myparsed = JSON.parse(myjson)
+
+            formattedResult.push(myparsed)
+            tempTime = new Date(formattedResult[i].payload.time.year, formattedResult[i].payload.time.month - 1, formattedResult[i].payload.time.day, formattedResult[i].payload.time.hour);
+            if (curDate.getTime() - tempTime.getTime() < twelveHours) {
+                delete formattedResult[i].payload.doorClosed
+            }
+        }
         res.send({
-            result
+            result: formattedResult
         })
     }).catch((err)=> {
+        console.log("Error occoured.")
         console.error(err)
     })
 })

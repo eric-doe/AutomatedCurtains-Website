@@ -38,6 +38,7 @@ function chartChangeDay(next_or_previous_day) {
     dayAvgArray = []
     getCurDayArr(allData)
     curDayAvgTemp = calcAvgDayTemp();
+    console.log(curDayAvgTemp)
     
     mymax = allData.curDayOfYearIndex >= 0 ? allData.maxList[allData.curDayOfYearIndex] : "none"
     mymin = allData.curDayOfYearIndex >= 0 ? allData.minList[allData.curDayOfYearIndex] : "none"
@@ -58,7 +59,6 @@ function updateChart(array, colorArray, door_or_curtain_mode, isLineChart) {
         data.addColumn('number', 'Temperature');
         data.addColumn({type: 'string', role:'annotation'});
     }
-    console.log(array)
     data.addRows(
         array
     );

@@ -87,6 +87,7 @@ function getDataFunc() {
                         dataArray[i].year = data.result[i].payload.time.year
                     }
                     dataArray = sortArrayByTime(dataArray)
+                    console.log(dataArray)
                     allData = createBigData(dataArray)
                     runCode()
                 })
@@ -124,6 +125,13 @@ function createBigData(arrayArg) {
         }
         objCount++;
         resultObject.data[curIndex].push(arrayArg[i])
+    }
+    if (typeof(resultObject.curDayOfYearIndex) == 'undefined') {
+        resultObject.curDayOfYearIndex = -1
+        resultObject.curDayOfYear = getDayOfYear(curTime)
+        
+        console.log("curDayOfYearIndex: " + resultObject.curDayOfYearIndex)
+        console.log("curDayOfYear: " + resultObject.curDayOfYear)
     }
     resultObject.maxList = []
     resultObject.minList = []

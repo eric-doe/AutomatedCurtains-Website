@@ -38,7 +38,7 @@ function findGlobalMinMaxTemp(array, min_or_max) {
 var curDayArray = []
 var dayAvgArray = []
 
-function getCurDayArr() {
+function getCurDayArr(allData) {
     if (allData.curDayOfYearIndex < 0) {
         return []
     }
@@ -72,7 +72,12 @@ function calcAvgDayTemp() {
     if (allData.curDayOfYearIndex < 0) {
         return
     }
-    
+    if (typeof(curDayArray) === 'undefined') {
+        curDayArray = []
+        console.log("undefined... return")
+        return
+    }
+    console.log(curDayArray)
     for (let i = 0; i < curDayArray.length; i++) {
         if (curHour != curDayArray[i].hour) {
             curHour = curDayArray[i].hour
